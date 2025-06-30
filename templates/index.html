@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fashion Recommendation System</title>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f8f9fa;
+            --accent-color: #ff6b6b;
+            --text-color: #333;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+        
+        h1, h2 {
+            color: var(--primary-color);
+            text-align: center;
+        }
+        
+        h1 {
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+        
+        h2 {
+            margin: 30px 0 20px;
+            font-size: 1.8rem;
+        }
+        
+        .upload-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+            background-color: var(--secondary-color);
+            padding: 30px;
+            border-radius: var(--border-radius);
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .file-input-wrapper input[type="file"] {
+            opacity: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            z-index: 2;
+        }
+        
+        .file-input-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 20px;
+            background-color: white;
+            border: 2px dashed var(--primary-color);
+            border-radius: var(--border-radius);
+            color: var(--primary-color);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            height: 60px;
+        }
+        
+        .file-input-wrapper:hover .file-input-label {
+            background-color: rgba(74, 144, 226, 0.1);
+        }
+        
+        .file-name {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;    
+            max-width: 400px;
+        }
+        
+        button:hover {
+            background-color: #3a7bc8;
+        }
+        
+        button:disabled {
+            background-color: #a0bfe0;
+            cursor: not-allowed;
+        }
+        
+        #error {
+            color: var(--accent-color);
+            margin: 15px 0;
+            font-weight: bold;
+        }
+        
+        .image-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 0 auto;
+            max-width: 1000px;
+        }
+        
+        .image-card {
+            position: relative;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            transition: transform 0.3s ease;
+            background-color: white;
+            padding: 10px;
+            width: 220px;
+            height: 330px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        
+        .image-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .image-container img {
+            width: 200px;
+            height: 220px;
+            object-fit: contain;
+            border-radius: 4px;
+            display: block;
+            background-color: var(--secondary-color);
+            border: 1px solid #eaeaea;
+        }
+        
+        .image-info {
+            width: 100%;
+            padding-top: 8px;
+            text-align: center;
+        }
+        
+        .category {
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 0.95rem;
+            margin: 5px 0;
+        }
+        
+        .confidence {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 5px;
+        }
+        
+        .confidence-text {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 3px;
+        }
+        
+        .confidence-bar {
+            width: 100%;
+            height: 6px;
+            background-color: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .confidence-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+        }
+        
+        .high-confidence {
+            background-color: #4CAF50;
+        }
+        
+        .medium-confidence {
+            background-color: #FFC107;
+        }
+        
+        .low-confidence {
+            background-color: #FF5722;
+        }
+        
+        /* Loader styles */
+        .loader-container {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            margin: 30px 0;
+        }
+        
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 5px solid var(--secondary-color);
+            border-bottom-color: var(--primary-color);
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+        
+        .loader-text {
+            margin-left: 15px;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        @keyframes rotation {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .image-card {
+                width: 180px;
+                height: 280px;
+            }
+            
+            .image-container img {
+                width: 160px;
+                height: 180px;
+            }
+            
+            .category {
+                font-size: 0.85rem;
+            }
+            
+            .confidence-text {
+                font-size: 0.75rem;
+            }
+        }
+        
+        /* Add image container title styling */
+        .section-title {
+            width: 100%;
+            margin: 30px 0 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--secondary-color);
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            text-align: center;
+        }
+    </style>
+    <!-- Include Axios from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Fashion Recommendation System</h1>
+        
+        <div class="upload-form">
+            <div class="file-input-wrapper">
+                <input type="file" id="imageUpload" accept="image/*" required>
+                <label for="imageUpload" class="file-input-label">Choose an image or drag & drop</label>
+            </div>
+            <div class="file-name" id="fileName"></div>
+            <button id="uploadBtn" onclick="uploadImage()">Upload and Recommend</button>
+        </div>
+
+        <div id="error"></div>
+
+        <div class="loader-container" id="loaderContainer">
+            <span class="loader"></span>
+            <span class="loader-text">Processing your image...</span>
+        </div>
+
+        <h2 id="uploadedTitle" class="section-title" style="display:none;">Uploaded Image</h2>
+        <div id="uploadedImage" class="image-container" style="display:none;"></div>
+
+        <h2 id="recommendationsTitle" class="section-title" style="display:none;">Recommended Images</h2>
+        <div id="recommendations" class="image-container" style="display:none;"></div>
+    </div>
+
+    <script>
+        // Display file name when selected
+        document.getElementById('imageUpload').addEventListener('change', function(e) {
+            const fileName = e.target.files[0] ? e.target.files[0].name : 'No file selected';
+            document.getElementById('fileName').textContent = fileName;
+        });
+
+        function uploadImage() {
+            const fileInput = document.getElementById('imageUpload');
+            const file = fileInput.files[0];
+            const uploadBtn = document.getElementById('uploadBtn');
+            const loaderContainer = document.getElementById('loaderContainer');
+            
+            if (!file) {
+                document.getElementById('error').innerText = 'Please select an image.';
+                return;
+            }
+
+            console.log('Uploading image:', file.name);
+            
+            // Show loader, hide previous results
+            loaderContainer.style.display = 'flex';
+            uploadBtn.disabled = true;
+            document.getElementById('error').innerText = '';
+            document.getElementById('uploadedTitle').style.display = 'none';
+            document.getElementById('uploadedImage').style.display = 'none';
+            document.getElementById('recommendationsTitle').style.display = 'none';
+            document.getElementById('recommendations').style.display = 'none';
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            axios.post('http://127.0.0.1:5000/upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+            .then(response => {
+                const data = response.data;
+                // Hide loader
+                loaderContainer.style.display = 'none';
+                uploadBtn.disabled = false;
+                
+                if (data.status === 'success') {
+                    console.log('==== FASHION RECOMMENDATION RESULTS ====');
+                    console.log('Uploaded Image:', data.uploaded_image);
+                    console.log('Category:', data.uploaded_category);
+                    console.log('Recommendations:');
+                    
+                    // Create a table for better console visualization
+                    console.table(data.recommendations.map((item, index) => {
+                        return {
+                            '#': index + 1,
+                            'Image': item.filename,
+                            'Category': item.category,
+                            'Confidence': item.confidence + '%'
+                        };
+                    }));
+                    
+                    // Calculate average confidence
+                    const avgConfidence = data.recommendations.reduce((sum, item) => sum + item.confidence, 0) / data.recommendations.length;
+                    console.log('Average match confidence:', avgConfidence.toFixed(2) + '%');
+                    console.log('======================================');
+                    
+                    // Display uploaded image
+                    document.getElementById('uploadedTitle').textContent = `Uploaded Image (${data.uploaded_category})`;
+                    document.getElementById('uploadedTitle').style.display = 'block';
+                    document.getElementById('uploadedImage').style.display = 'flex';
+                    document.getElementById('uploadedImage').innerHTML = 
+                        `<div class="image-card">
+                            <img src="${data.image_url}" alt="Uploaded Image">
+                            <div class="image-info">
+                                <div class="category">${data.uploaded_category}</div>
+                            </div>
+                         </div>`;
+
+                    // Display recommendations
+                    document.getElementById('recommendationsTitle').style.display = 'block';
+                    document.getElementById('recommendations').style.display = 'flex';
+                    
+                    // Create HTML for each recommendation
+                    const recommendationsHTML = data.recommendations.map(item => {
+                        // Determine confidence class based on the score
+                        let confidenceClass = "medium-confidence";
+                        if (item.confidence >= 80) {
+                            confidenceClass = "high-confidence";
+                        } else if (item.confidence < 65) {
+                            confidenceClass = "low-confidence";
+                        }
+                        
+                        return `<div class="image-card">
+                            <img src="http://127.0.0.1:5000/images/${item.filename}" alt="Recommended Image">
+                            <div class="image-info">
+                                <div class="category">${item.category}</div>
+                                <div class="confidence">
+                                    <div class="confidence-text">Match: ${item.confidence}%</div>
+                                    <div class="confidence-bar">
+                                        <div class="confidence-fill ${confidenceClass}" style="width: ${item.confidence}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+                    }).join('');
+                    
+                    document.getElementById('recommendations').innerHTML = recommendationsHTML;
+                } else {
+                    console.error('Error:', data.error);
+                    document.getElementById('error').innerText = data.error || 'Unknown error';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                loaderContainer.style.display = 'none';
+                uploadBtn.disabled = false;
+                document.getElementById('error').innerText = 'Failed to upload image. Check console for details.';
+            });
+        }
+    </script>
+</body>
+</html>

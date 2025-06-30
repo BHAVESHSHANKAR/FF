@@ -1,0 +1,15 @@
+numpy==1.26.4
+tensorflow==2.16.1
+scikit-learn==1.4.2
+pillow==10.3.0
+flask==3.0.3
+cloudinary==1.37.0
+python-dotenv==1.0.1
+flask-cors==4.0.0
+fpdf==1.7.2
+flask-swagger-ui==4.11.1
+pymongo[srv]==4.6.2
+bcrypt==4.1.2
+PyJWT==2.8.0
+dnspython==2.6.1
+gunicorn==21.2.0

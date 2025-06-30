@@ -1,0 +1,257 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Fashion Recommendation API",
+    "description": "API for fashion image recommendations and reports",
+    "version": "1.0.0"
+  },
+  "basePath": "/",
+  "schemes": [
+    "http"
+  ],
+  "consumes": [
+    "application/json",
+    "multipart/form-data"
+  ],
+  "produces": [
+    "application/json",
+    "application/pdf"
+  ],
+  "paths": {
+    "/upload": {
+      "post": {
+        "summary": "Upload an image for fashion recommendations",
+        "description": "Upload a fashion image to get similar item recommendations",
+        "operationId": "uploadImage",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "file",
+            "in": "formData",
+            "description": "Fashion image file to upload",
+            "required": true,
+            "type": "file"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "uploaded_image": {
+                  "type": "string",
+                  "description": "Filename of the uploaded image"
+                },
+                "uploaded_category": {
+                  "type": "string",
+                  "description": "Category of the uploaded fashion item"
+                },
+                "image_url": {
+                  "type": "string",
+                  "description": "URL of the uploaded image on Cloudinary"
+                },
+                "recommendations": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "filename": {
+                        "type": "string",
+                        "description": "Filename of the recommended item"
+                      },
+                      "category": {
+                        "type": "string",
+                        "description": "Category of the recommended item"
+                      },
+                      "confidence": {
+                        "type": "integer",
+                        "description": "Confidence score of the recommendation"
+                      }
+                    }
+                  }
+                },
+                "status": {
+                  "type": "string",
+                  "description": "Status of the operation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - No file uploaded or no file selected"
+          }
+        }
+      }
+    },
+    "/generate-report": {
+      "post": {
+        "summary": "Generate a PDF report",
+        "description": "Generate a PDF report for the fashion style analysis",
+        "operationId": "generateReport",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/pdf"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Fashion style analysis data",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "recommendations": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "filename": {
+                        "type": "string"
+                      },
+                      "category": {
+                        "type": "string"
+                      },
+                      "confidence": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                },
+                "uploaded_category": {
+                  "type": "string"
+                },
+                "style": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns a PDF file"
+          },
+          "400": {
+            "description": "Bad request - No data provided"
+          },
+          "500": {
+            "description": "Server error - Failed to generate PDF report"
+          }
+        }
+      }
+    },
+    "/uploads/{filename}": {
+      "get": {
+        "summary": "Get uploaded image",
+        "description": "Get an uploaded image by filename",
+        "operationId": "getUploadedImage",
+        "parameters": [
+          {
+            "name": "filename",
+            "in": "path",
+            "description": "Filename of the uploaded image",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns the image file"
+          },
+          "404": {
+            "description": "Image not found"
+          }
+        }
+      }
+    },
+    "/images/{filename}": {
+      "get": {
+        "summary": "Get dataset image",
+        "description": "Get a dataset image by filename",
+        "operationId": "getDatasetImage",
+        "parameters": [
+          {
+            "name": "filename",
+            "in": "path",
+            "description": "Filename of the dataset image",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns the image file"
+          },
+          "404": {
+            "description": "Image not found"
+          }
+        }
+      }
+    },
+    "/test": {
+      "get": {
+        "summary": "Test JSON endpoint",
+        "description": "Sample endpoint that returns a JSON response without requiring file upload",
+        "operationId": "testEndpoint",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Sample JSON response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "uploaded_image": {
+                  "type": "string",
+                  "description": "Filename of the sample image"
+                },
+                "uploaded_category": {
+                  "type": "string",
+                  "description": "Category of the sample item"
+                },
+                "image_url": {
+                  "type": "string",
+                  "description": "URL of the sample image"
+                },
+                "recommendations": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "filename": {
+                        "type": "string",
+                        "description": "Filename of the recommended item"
+                      },
+                      "category": {
+                        "type": "string",
+                        "description": "Category of the recommended item"
+                      },
+                      "confidence": {
+                        "type": "integer",
+                        "description": "Confidence score of the recommendation"
+                      }
+                    }
+                  }
+                },
+                "status": {
+                  "type": "string",
+                  "description": "Status of the operation"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+} 
